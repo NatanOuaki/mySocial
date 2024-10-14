@@ -1,0 +1,20 @@
+.contentMain {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.container {
+  display: flex; 
+}
+
+.navbar {
+  flex: 0 0 200px; 
+}
+
+.main-content {
+  flex: 1; 
+  padding: 20px;
+}
+

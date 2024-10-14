@@ -1,0 +1,39 @@
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 13vw;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border-right: 1px solid black ;
+    padding-left: 20px;
+    padding-top: 20px;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: #333;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.nav-item:hover {
+    color: #064f9d;
+}
+
+.material-icons {
+    font-size: 36px;
+}
+
+p {
+    font-size: 20px;
+    margin-left: 10px;
+    text-align: left;
+}
