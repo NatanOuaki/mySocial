@@ -1,8 +1,10 @@
+import SignIn from "../components/SignIn/SignIn";
+
 function Login() {
 
     return (
         <>
-            <h1> HELLO LOGIN </h1>
+            <SignIn />
         </>
     );
 }

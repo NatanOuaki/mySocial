@@ -1,8 +1,10 @@
+import Posts from "../components/Posts/Posts";
+
 function AddPost() {
 
     return (
         <>
-            <h1> HELLO AddPost </h1>
+            <Posts/>
         </>
     );
 }

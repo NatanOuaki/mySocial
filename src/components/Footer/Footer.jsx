@@ -1,4 +1,5 @@
 import './footer.css';
+import logo from "../../assets/logo.png";
 
 
 function Footer(){
@@ -6,7 +7,7 @@ function Footer(){
     let year = d.getFullYear();
     return(
         <footer>
-            {/*<img className="logo" src={logo} alt="Logo mySocial" />*/}
+            <img className="logo" src={logo} alt="Logo mySocial" />
             <p className="footerText">© {year} mySocial. All rights reserved</p>
         </footer>
     );

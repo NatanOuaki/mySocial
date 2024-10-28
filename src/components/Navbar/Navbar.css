@@ -1,17 +1,30 @@
-.navbar {
+.navbarComponent{
     position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
-    width: 13vw;
+    width: 14vw;
+    background-color: #f8f9fa;
+    border-right: 1px solid black ;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
+.navbar {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    background-color: #f8f9fa;
-    border-right: 1px solid black ;
     padding-left: 20px;
     padding-top: 20px;
+}
+
+.logoNavBar{
+    width: 180px;
+    height: auto;
+    margin: 20px auto -50px auto;
 }
 
 .nav-item {
@@ -37,3 +50,5 @@ p {
     margin-left: 10px;
     text-align: left;
 }
+
+

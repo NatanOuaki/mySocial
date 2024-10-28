@@ -1,8 +1,10 @@
+import SignUp from "../components/SignUp/SignUp";
+
 function Register() {
 
     return (
         <>
-            <h1> HELLO REGISTER </h1>
+            <SignUp/>
         </>
     );
 }

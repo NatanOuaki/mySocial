@@ -1,56 +1,53 @@
-// Posts.js
-import React, { useState, useEffect } from 'react';
-import { db } from '../../firebase';
+import React, { useState } from 'react';
+import { db, storage } from '../../firebase';
 import { useAuth } from '../../AuthContext';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const Posts = () => {
     const [content, setContent] = useState('');
-    const [posts, setPosts] = useState([]);
+    const [image, setImage] = useState(null);
     const { currentUser } = useAuth();
-
-    useEffect(() => {
-        const unsubscribe = db.collection('posts')
-        .orderBy('createdAt', 'desc')
-        .onSnapshot(snapshot => {
-            const postsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setPosts(postsData);
-        });
-        return unsubscribe;
-    }, []);
 
     const handlePostSubmit = async (e) => {
         e.preventDefault();
         if (!currentUser) return;
-        
-        await db.collection('posts').add({
-        userId: currentUser.uid,
-        content,
-        createdAt: new Date(),
+
+        let imageUrl = null;
+        if (image) {
+            const imageRef = ref(storage, `posts/${currentUser.uid}_${Date.now()}`);
+            await uploadBytes(imageRef, image);
+            imageUrl = await getDownloadURL(imageRef);
+        }
+
+        await addDoc(collection(db, 'posts'), {
+            userId: currentUser.uid,
+            userName: currentUser.displayName || "Anonymous",
+            content,
+            imageUrl, 
+            createdAt: Timestamp.now(),
         });
 
         setContent('');
+        setImage(null);
     };
 
     return (
         <div>
-        <h1>Posts</h1>
-        <form onSubmit={handlePostSubmit}>
-            <input 
-            type="text" 
-            placeholder="What's on your mind?" 
-            value={content} 
-            onChange={(e) => setContent(e.target.value)} 
-            />
-            <button type="submit">Post</button>
-        </form>
-
-        <div>
-            {posts.map(post => (
-            <div key={post.id}>
-                <p>{post.content}</p>
-            </div>
-            ))}
-        </div>
+            <form onSubmit={handlePostSubmit}>
+                <input 
+                    type="text" 
+                    placeholder="What's on your mind?" 
+                    value={content} 
+                    onChange={(e) => setContent(e.target.value)} 
+                />
+                <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={(e) => setImage(e.target.files[0])} 
+                />
+                <button type="submit">Post</button>
+            </form>
         </div>
     );
 };
