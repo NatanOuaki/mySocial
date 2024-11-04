@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, arrayUnion, arrayRemove, getDoc } from 'firebase/firestore';
 import { useAuth } from '../AuthContext'; 
 import '../assets/homePage.css';
 import heartEmpty from "../assets/heartEmpty.svg";
@@ -10,16 +10,40 @@ import heartFilled from "../assets/heartFilled.svg";
 const Home = () => {
     const [posts, setPosts] = useState([]);
     const [hoveredPostId, setHoveredPostId] = useState(null);
+    const [following, setFollowing] = useState([]);
     const { currentUser } = useAuth(); 
 
     useEffect(() => {
-        const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+        const fetchFollowing = async () => {
+            if (currentUser) {
+                const userDocRef = doc(db, 'users', currentUser.uid);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    const followingData = userDoc.data().connections || [];
+                    setFollowing([...followingData, currentUser.uid]);
+                }
+            }
+        };
+
+        fetchFollowing();
+    }, [currentUser]);
+
+    useEffect(() => {
+        if (following.length === 0) return;
+
+        const q = query(
+            collection(db, 'posts'), 
+            where('userId', 'in', following), 
+            orderBy('createdAt', 'desc')
+        );
+
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const postsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setPosts(postsData);
         });
+
         return unsubscribe;
-    }, []);
+    }, [following]);
 
     const handleLike = async (postId, likedBy) => {
         const postRef = doc(db, 'posts', postId);
