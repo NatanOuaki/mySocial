@@ -24,7 +24,7 @@ const App = () => {
             <div style={currentUser ? {width: '87vw', marginLeft: '13vw'} : { }}>
                     <div className='contentMain'>
                         <Routes>
-                            <Route path="/" element={<AuthRoute><Home /></AuthRoute>} />
+                            <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
                             <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
                             <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
                             <Route path="/profile" element={<PrivateRoute><Profil /></PrivateRoute>} />
