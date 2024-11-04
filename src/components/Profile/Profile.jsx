@@ -14,6 +14,7 @@ const Profile = ({ userId }) => {
     const [displayName, setDisplayName] = useState(''); 
     const isCurrentUserProfile = !userId || userId === currentUser?.uid;
     const [isConnectedTo, setIsConnectedTo] = useState(false);
+    const [connectionsCount, setConnectionsCount] = useState(0);
 
     useEffect(() => {
         const fetchProfileData = async () => {
@@ -24,7 +25,8 @@ const Profile = ({ userId }) => {
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
                     setProfileImageURL(userData.photoURL || userImage);
-                    setDisplayName(userData.displayName || uid); 
+                    setDisplayName(userData.displayName || uid);
+                    setConnectionsCount(userData.connections?.length || 0); // Set connections count
                 }
             }
         };
@@ -40,23 +42,20 @@ const Profile = ({ userId }) => {
             }
         };
 
-        const fetchConnectedUsers = async () => {
-            const uid = currentUser.uid;
-            if (uid) {
-                const userDocRef = doc(db, 'users', uid);
+        const fetchConnectionStatus = async () => {
+            if (!isCurrentUserProfile && currentUser) {
+                const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
-                    if (userData.connections.includes(userId)) 
-                        setIsConnectedTo(true);
+                    setIsConnectedTo(userData.connections?.includes(userId));
                 }
             }
         };
 
-
         fetchProfileData();
         fetchUserPosts();
-        fetchConnectedUsers();
+        fetchConnectionStatus();
     }, [currentUser, userId, isCurrentUserProfile]);
 
     const handleProfileImageChange = async (event) => {
@@ -76,24 +75,25 @@ const Profile = ({ userId }) => {
         }
     };
 
-    const handleConnect = async () =>{
+    const handleConnect = async () => {
         const uid = currentUser.uid;
         const userDocRef = doc(db, 'users', uid);
         await updateDoc(userDocRef, {
             connections: arrayUnion(userId)
-        })
+        });
         setIsConnectedTo(true);
-    }
+        setConnectionsCount(prevCount => prevCount + 1);
+    };
 
-        const handleRemove = async () =>{
+    const handleRemove = async () => {
         const uid = currentUser.uid;
         const userDocRef = doc(db, 'users', uid);
         await updateDoc(userDocRef, {
             connections: arrayRemove(userId)
-        })
+        });
         setIsConnectedTo(false);
-    }
-
+        setConnectionsCount(prevCount => prevCount - 1);
+    };
 
     return (
         <div style={{ textAlign: 'center' }}>
@@ -120,8 +120,10 @@ const Profile = ({ userId }) => {
                     <button onClick={handleRemove} style={{ width: '10%', height: '3%' }}>Remove -</button>
                 ) :(
                     <button onClick={handleConnect} style={{ width: '10%', height: '3%' }}>Connect +</button>
-                ) }
+                )}
             </div>
+
+            <p>Connections: {connectionsCount}</p>
 
             {isModalOpen && (
                 <div style={{
