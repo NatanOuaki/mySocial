@@ -1,8 +1,9 @@
 import './App.css';
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { useParams, BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
+import Profile from './components/Profile/Profile';
 import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
@@ -27,6 +28,7 @@ const App = () => {
                             <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
                             <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
                             <Route path="/profile" element={<PrivateRoute><Profil /></PrivateRoute>} />
+                            <Route path="/user/:userId" element={<PrivateRoute><ProfileWrapper/></PrivateRoute>} />
                             <Route path="/addPost" element={<PrivateRoute><AddPost /></PrivateRoute>} />
                             <Route path="/searchuser" element={<PrivateRoute><SearchUser /></PrivateRoute>} />
                         </Routes>
@@ -36,5 +38,11 @@ const App = () => {
         </div>
     );
 };
+
+const ProfileWrapper = () => {
+    const { userId } = useParams(); // Extract userId from the URL
+    return <Profile userId={userId} />; // Pass userId to Profile component
+};
+
 
 export default App;

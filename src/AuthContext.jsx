@@ -1,6 +1,6 @@
 // AuthContext.js
 import React, { useContext, useState, useEffect } from 'react';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
 import { 
     createUserWithEmailAndPassword, 
     updateProfile,
@@ -8,6 +8,9 @@ import {
     signOut, 
     onAuthStateChanged 
 } from 'firebase/auth';
+import { setDoc, doc } from 'firebase/firestore';
+
+
 
 const AuthContext = React.createContext();
 
@@ -27,11 +30,22 @@ export const AuthProvider = ({ children }) => {
 
     const signUp = async (email, password, fullName) => {
         try {
+            // Create the user with email and password
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
+            // Update the user's profile with their display name
             await updateProfile(user, {
                 displayName: fullName
+            });
+
+            // Create a document in Firestore for the user
+            const userRef = doc(db, 'users', user.uid); // 'users' is the collection name
+            await setDoc(userRef, {
+                displayName: fullName,
+                email: email,
+                uid: user.uid, // Optional: Store user ID
+                // Add any other fields you need
             });
 
             console.log('User signed up with name:', fullName);
