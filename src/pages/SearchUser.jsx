@@ -8,36 +8,36 @@ const UserSearch = () => {
     const [searchResults, setSearchResults] = useState([]);
     const navigate = useNavigate();
 
-    const handleSearchChange = async (e) => {
-        const term = e.target.value;
-        setSearchTerm(term);
+const handleSearchChange = async (e) => {
+    const term = e.target.value.toLowerCase();  
+    setSearchTerm(term);
 
-        if (term.trim() === '') {
-            setSearchResults([]);
-            return;
-        }
+    if (term.trim() === '') {
+        setSearchResults([]);
+        return;
+    }
 
-        try {
-            const usersRef = collection(db, 'users');
-            const searchQuery = query(
-                usersRef,
-                where('displayName', '>=', term),
-                where('displayName', '<=', term + '\uf8ff')
-            );
+    try {
+        const usersRef = collection(db, 'users');
+        const querySnapshot = await getDocs(usersRef);
 
-            const querySnapshot = await getDocs(searchQuery);
-            
-            console.log("Search Term:", term); 
-            console.log("Number of Results:", querySnapshot.docs.length); 
-
-            const results = querySnapshot.docs.map(doc => ({
+        const results = querySnapshot.docs
+            .map(doc => ({
                 id: doc.id,
                 ...doc.data()
-            }));
-            setSearchResults(results);
-        } catch (error) {
-        }
-    };
+            }))
+            .filter(user => {
+                return user.displayName.toLowerCase().includes(term);
+            });
+
+        console.log("Search Term:", term); 
+        console.log("Number of Results:", results.length);
+
+        setSearchResults(results);
+    } catch (error) {
+        console.error("Error fetching search results:", error);
+    }
+};
 
     const handleUserClick = (userId) => {
         navigate(`/user/${userId}`);
